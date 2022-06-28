@@ -18,7 +18,7 @@ namespace oauth_mvc.Controllers
             return View();
         }
 
-        public async Task<ActionResult> CallBack(string code, string state)
+        public async Task<ActionResult> LineNotifyCallBack(string code, string state)
         {
             using (var client = new HttpClient())
             {
@@ -28,7 +28,7 @@ namespace oauth_mvc.Controllers
                 {
                     { "grant_type", "authorization_code"},
                     { "code", code },
-                    { "redirect_uri", "https://localhost:44312/OAuth/CallBack"},
+                    { "redirect_uri", "https://localhost:44312/OAuth/LineNotifyCallBack"},
                     { "client_id", "r6UP0t7tf7biApeFBTMSuf"},
                     { "client_secret", "IQTmHYe5sOsL5TlJrMm2sfwiESqIZYSb0fy0yfKVdNR" }
                 });
@@ -43,19 +43,19 @@ namespace oauth_mvc.Controllers
                     cookie.Values.Add("access_token", lineNotify.Access_token);
                     Response.Cookies.Add(cookie);
 
-                    return RedirectToAction("SendMessage");
+                    return RedirectToAction("LineNotifySendMessage");
                 }
                 return RedirectToAction("Index");
             }
         }
 
-        public ActionResult SendMessage()
+        public ActionResult LineNotifySendMessage()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> SendMessage(string message)
+        public async Task<ActionResult> LineNotifySendMessage(string message)
         {
             var token = Request.Cookies["LineNotify"]?["access_token"];
             using (var client = new HttpClient())
@@ -68,7 +68,7 @@ namespace oauth_mvc.Controllers
                 });
                 await client.PostAsync("", content);
 
-                return RedirectToAction("SendMessage");
+                return RedirectToAction("LineNotifySendMessage");
             }
         }
     }
