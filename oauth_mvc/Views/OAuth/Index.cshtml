@@ -6,4 +6,14 @@
 <h2>Index</h2>
 
 <a href="https://notify-bot.line.me/oauth/authorize?response_type=code&client_id=r6UP0t7tf7biApeFBTMSuf&redirect_uri=https://localhost:44312/OAuth/LineNotifyCallBack&scope=notify&state=123">LineNotify</a>
+<br />
+<a href="https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1657259162&redirect_uri=https://localhost:44312/OAuth/LineLogInCallBack&state=12345abcde&scope=profile%20openid&nonce=09876xyz">LineLogIn</a>
 
+@if (ViewBag.UserID != null || ViewBag.DisplayName != null)
+{
+    <h3>基本資料</h3>
+    <div>
+        UserID: @ViewBag.UserID
+        DisplayName: @ViewBag.DisplayName
+    </div>
+}

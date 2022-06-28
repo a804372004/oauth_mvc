@@ -15,6 +15,9 @@ namespace oauth_mvc.Controllers
     {
         public ActionResult Index()
         {
+            ViewBag.UserID = TempData["UserID"];
+            ViewBag.DisplayName = TempData["DisplayName"];
+
             return View();
         }
 
@@ -71,7 +74,50 @@ namespace oauth_mvc.Controllers
                 return RedirectToAction("LineNotifySendMessage");
             }
         }
+
+        public async Task<ActionResult> LineLogInCallBack(string code, string error)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://api.line.me/oauth2/v2.1/token");
+                var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { "grant_type", "authorization_code"},
+                    { "code", code },
+                    { "redirect_uri", "https://localhost:44312/OAuth/LineLogInCallBack"},
+                    { "client_id", "1657259162"},
+                    { "client_secret", "4993340944b40619e44381305fb8f416" }
+                });
+                var response = await client.PostAsync("", content);
+                var result = response.Content.ReadAsStringAsync().Result;
+                var lineLogin = JsonConvert.DeserializeObject<LineLogin>(result);
+                var proFile = GetProfile(lineLogin.Access_token);
+
+                TempData["UserID"] = proFile.Result.UserID;
+                TempData["DisplayName"] = proFile.Result.DisplayName;
+
+                return RedirectToAction("Index");
+            }
+        }
+
+        private async Task<LineLogin> GetProfile(string token)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                var response = await client.GetAsync("https://api.line.me/v2/profile");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content.ReadAsStringAsync().Result;
+                    var lineLogIn = JsonConvert.DeserializeObject<LineLogin>(result);
+
+                    return lineLogIn;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
     }
-
-
 }
